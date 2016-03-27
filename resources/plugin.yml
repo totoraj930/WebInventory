@@ -1,0 +1,54 @@
+name: WebInventory
+main: net.totoraj.webinventory.WebInventory
+version: 0.0.1
+authors: [totoraj]
+website: "http://totoraj.net"
+depend: []
+commands:
+  webinventoryadmin:
+    description: プラグイン管理コマンド
+    aliases: [wiadmin, wia]
+    usage: /wia <reload | yaml | close | toggle>
+    permission: webinventory.command.admin
+    permission-message: パーミッション "<permission>" がないため、実行できません。
+  webinventoryopen:
+    description: プレイヤーのWebInventoryを開くコマンド
+    aliases: [wiopen, wio]
+    usage: /wio <Player>
+    permission: webinventory.command.open
+    permission-message: パーミッション "<permission>" がないため、実行できません。
+  webinventoryview:
+    description: プレイヤーのWebInventoryを見るコマンド
+    aliases: [wiview, wiv]
+    usage: /wiv <Player>
+    permission: webinventory.command.view
+    permission-message: パーミッション "<permission>" がないため、実行できません。
+  webinventory:
+    description: WebInventoryコマンド
+    aliases: [webi, wi]
+    usage: /wi signup
+    permission: webinventory.command.wi
+    permission-message: パーミッション "<permission>" がないため、実行できません。
+permissions:
+  webinventory.*:
+    description: WebInventoryのすべての権限
+    children:
+      webinventory.command.webi: true
+      webinventory.command.open: true
+      webinventory.command.view: true
+      webinventory.use: true
+  webinventory.command.admin:
+    description: wiaコマンドの権限
+    default: op
+  webinventory.command.open:
+    description: wioコマンドの権限
+    default: op
+  webinventory.command.view:
+    description: wivコマンドの権限
+    default: op
+  webinventory.command.wi:
+    description: wiコマンドの権限
+    default: true
+  webinventory.use:
+    description: WebInventoryを使う権限
+    default: true

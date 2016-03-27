@@ -1,0 +1,7 @@
+Database:
+  Address: 'localhost'
+  Port: 3306
+  Username: ''
+  Password: ''
+  Db: ''
+  Prefix: 'wi_'
