@@ -6,27 +6,32 @@ import java.sql.Statement;
 import java.util.UUID;
 
 import net.totoraj.webinventory.DataManager;
-import net.totoraj.webinventory.WebInventory;
 
 public class IdTable {
-	private WebInventory plugin;
 	private final DataManager datamanager;
 	private final String tableName;
 	private final MySQL mysql;
 
-	public IdTable(WebInventory plugin, DataManager datamanager) {
-		this.plugin = plugin;
+	public IdTable(DataManager datamanager) {
 		this.datamanager = datamanager;
 		this.tableName = datamanager.getPrefix() + "id";
 		this.mysql = datamanager.getMySQL();
 	}
 
 	public boolean setUpTable() {
-		String columns[] = { "id int auto_increment", "name char(16)",
-				"uuid varchar(36) unique", "index(id)" };
-		String cls = String.join(",", columns);
-		String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + cls
-				+ ")";
+//		String columns[] = { "id int auto_increment", "name char(16)",
+//				"uuid varchar(36) unique", "index(id)" };
+//		String cls = String.join(",", columns);
+//		String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + cls
+//				+ ")";
+
+		String sql = "CREATE TABLE IF NOT EXISTS "+tableName+" ("
+				+"id int AUTO_INCREMENT,\n"
+				+"name char(16) NOT NULL,\n"
+				+"uuid varchar(36) NOT NULL UNIQUE,\n"
+				+"PRIMARY KEY(id),\n"
+				+"INDEX(id)\n"
+				+")";
 
 		// テーブル作成SQLをデータベースに投げる
 		Statement stmt = null;
@@ -112,11 +117,13 @@ public class IdTable {
 		Statement stmt = null;
 		String sql = null;
 		int id = getPlayerIdFromUUID(uuid);
+		boolean isInsert = false;
 		// 同じuuidがなければINSERT
 		if (id == 0) {
 			sql = "INSERT INTO "+tableName
 					+" (name, uuid) VALUES ("
 					+"'"+playerName+"','"+uuid.toString()+"')";
+			isInsert = true;
 		}
 		// 同じuuidがあればUPDATE
 		else {
@@ -129,16 +136,18 @@ public class IdTable {
 		try {
 			stmt = mysql.getConnection().createStatement();
 			stmt.execute(sql);
+			stmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
-		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
+		}
 
-				}
+
+		// 新規追加だったらアイテムレコードを用意する
+		if (isInsert) {
+			id = this.getPlayerIdFromUUID(uuid);
+			if (id != 0) {
+				datamanager.getItemTable().setUpPlayerItemRecords(id);
 			}
 		}
 		return true;
