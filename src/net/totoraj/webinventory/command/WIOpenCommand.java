@@ -31,7 +31,7 @@ public class WIOpenCommand implements TabExecutor{
 				sender.sendMessage(WIMessages.getNotExist());
 				return true;
 			}
-			if (!plugin.CAN_USE) {
+			if (!plugin.DATA_MANAGER.isAvailable() || !plugin.CAN_USE) {
 				targetPlayer.sendMessage(WIMessages.getCanNotUse());
 				sender.sendMessage(WIMessages.getCanNotUse());
 				return true;

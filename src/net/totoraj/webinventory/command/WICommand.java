@@ -22,6 +22,10 @@ public class WICommand implements TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
+		if (!plugin.DATA_MANAGER.isAvailable()) {
+			sender.sendMessage(WIMessages.getCanNotUse());
+			return true;
+		}
 		if (args.length == 0) {
 			sender.sendMessage(WIMessages.getNotEnoughArguments());
 			return true;
