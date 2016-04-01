@@ -51,6 +51,7 @@ public class DataManager {
 	public void setUp() {
 		// MySQLに接続
 		available = mysql.connect();
+		plugin.CAN_USE = available;
 
 		// 接続されていれば初期処理
 		if (available) {

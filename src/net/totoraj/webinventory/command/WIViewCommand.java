@@ -21,7 +21,7 @@ public class WIViewCommand implements TabExecutor{
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
-		if (!plugin.DATA_MANAGER.isAvailable()) {
+		if (!plugin.DATA_MANAGER.isAvailable() || !plugin.CAN_USE) {
 			sender.sendMessage(WIMessages.getCanNotUse());
 			return true;
 		}
@@ -34,10 +34,6 @@ public class WIViewCommand implements TabExecutor{
 			return true;
 		}
 		if (args.length == 1) {
-			if (!plugin.CAN_USE) {
-				sender.sendMessage(WIMessages.getCanNotUse());
-				return true;
-			}
 			Player viewer = (Player) sender;
 			Player targetPlayer = plugin.getServer().getPlayer(args[0]);
 			if (targetPlayer == null) {

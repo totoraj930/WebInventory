@@ -23,7 +23,7 @@ public class WICommand implements TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
-		if (!plugin.DATA_MANAGER.isAvailable()) {
+		if (!plugin.DATA_MANAGER.isAvailable() || !plugin.CAN_USE) {
 			sender.sendMessage(WIMessages.getCanNotUse());
 			return true;
 		}
