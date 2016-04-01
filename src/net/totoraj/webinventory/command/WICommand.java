@@ -23,11 +23,15 @@ public class WICommand implements TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
-		if (!plugin.DATA_MANAGER.isAvailable() || sender.hasPermission("webinventory.use")) {
+		if (!plugin.DATA_MANAGER.isAvailable()) {
 			sender.sendMessage(WIMessages.getCanNotUse());
 			return true;
 		}
 
+		if (!sender.hasPermission("webinventory.use")) {
+			sender.sendMessage(WIMessages.getDoNotHavePermission());
+			return true;
+		}
 		// wiコマンド
 		if (args.length == 0) {
 			if (!(sender instanceof Player)) {
