@@ -42,7 +42,6 @@ public class WICommand implements TabExecutor {
 			UUID targetUUID = targetPlayer.getUniqueId();
 			boolean result = plugin.INV_MANAGER.openInventory(targetUUID, targetUUID);
 			if (!result) {
-				targetPlayer.sendMessage(WIMessages.getCouldNotOpenInventory());
 				sender.sendMessage(WIMessages.getCouldNotOpenInventory());
 			}
 			return true;
