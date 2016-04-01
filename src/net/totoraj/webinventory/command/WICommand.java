@@ -2,6 +2,7 @@ package net.totoraj.webinventory.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import net.totoraj.webinventory.WebInventory;
 import net.totoraj.webinventory.config.WIMessages;
@@ -22,14 +23,28 @@ public class WICommand implements TabExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label,
 			String[] args) {
-		if (!plugin.DATA_MANAGER.isAvailable()) {
+		if (!plugin.DATA_MANAGER.isAvailable() || sender.hasPermission("webinventory.use")) {
 			sender.sendMessage(WIMessages.getCanNotUse());
 			return true;
 		}
+
+		// wiコマンド
 		if (args.length == 0) {
-			sender.sendMessage(WIMessages.getNotEnoughArguments());
+			if (!(sender instanceof Player)) {
+				sender.sendMessage(WIMessages.getNotPlayer());
+				return true;
+			}
+			Player targetPlayer = (Player) sender;
+			UUID targetUUID = targetPlayer.getUniqueId();
+			boolean result = plugin.INV_MANAGER.openInventory(targetUUID, targetUUID);
+			if (!result) {
+				targetPlayer.sendMessage(WIMessages.getCouldNotOpenInventory());
+				sender.sendMessage(WIMessages.getCouldNotOpenInventory());
+			}
 			return true;
 		}
+
+		// wi signupコマンド
 		if (args[0].equals("signup")) {
 			if (!(sender instanceof Player)) {
 				sender.sendMessage(WIMessages.getNotPlayer());
