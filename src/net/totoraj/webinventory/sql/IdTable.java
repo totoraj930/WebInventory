@@ -1,5 +1,6 @@
 package net.totoraj.webinventory.sql;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,29 +26,31 @@ public class IdTable {
 //		String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + cls
 //				+ ")";
 
-		String sql = "CREATE TABLE IF NOT EXISTS "+tableName+" ("
-				+"id int AUTO_INCREMENT,\n"
-				+"name char(16) NOT NULL,\n"
-				+"uuid varchar(36) NOT NULL UNIQUE,\n"
-				+"PRIMARY KEY(id),\n"
-				+"INDEX(id)\n"
-				+")";
+		String sql = ""
+				+"\n"+"CREATE TABLE IF NOT EXISTS "+tableName+" ("
+				+"\n"+"id int AUTO_INCREMENT,"
+				+"\n"+"name char(16) NOT NULL,"
+				+"\n"+"uuid varchar(36) NOT NULL UNIQUE,"
+				+"\n"+"PRIMARY KEY(id),"
+				+"\n"+"INDEX(id)"
+				+"\n"+");";
 
 		// テーブル作成SQLをデータベースに投げる
+		Connection con = null;
 		Statement stmt = null;
 		try {
-			stmt = mysql.getConnection().createStatement();
-			stmt.execute(sql);
+			con = mysql.getConnection();
+			if (con == null) {
+				return false;
+			}
+			stmt = con.createStatement();
+			stmt.executeUpdate(sql);
+			con.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-				}
-			}
+			mysql.closeStatement(stmt);
 		}
 		return true;
 	}
@@ -55,12 +58,18 @@ public class IdTable {
 	// 指定されたuuidのプレイヤーのデータベースのidを返す
 	// 存在しなければ0を返す
 	public int getPlayerIdFromUUID (UUID uuid) {
-		Statement stmt = null;
-		ResultSet rset = null;
 		int id = 0;
 		String sql = "SELECT * FROM "+tableName
 				+" WHERE uuid = '"+uuid.toString()+"'";
+
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rset = null;
 		try {
+			con = mysql.getConnection();
+			if (con == null) {
+				return 0;
+			}
 			stmt = mysql.getConnection().createStatement();
 			rset = stmt.executeQuery(sql);
 			while (rset.next()) {
@@ -69,13 +78,8 @@ public class IdTable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-
-				}
-			}
+			mysql.closeResultSet(rset);
+			mysql.closeStatement(stmt);
 		}
 
 		return id;
@@ -84,15 +88,16 @@ public class IdTable {
 	// 指定されたnameのプレイヤーのデータベースのidを返す
 	// 存在しなければ0を返す
 	public int getPlayerIdFromName (String playerName) {
-		Statement stmt = null;
-		ResultSet rset = null;
 		int id = 0;
 		String sql = "SELECT * FROM "+tableName
 				+" WHERE uuid = '"+playerName+"'";
-
+		Connection con = null;
+		Statement stmt = null;
+		ResultSet rset = null;
 		// SQL文を投げる
 		try {
-			stmt = mysql.getConnection().createStatement();
+			con = mysql.getConnection();
+			stmt = con.createStatement();
 			rset = stmt.executeQuery(sql);
 			while (rset.next()) {
 				id = rset.getInt("id");
@@ -100,13 +105,8 @@ public class IdTable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-
-				}
-			}
+			mysql.closeStatement(stmt);
+			mysql.closeResultSet(rset);
 		}
 
 		return id;
@@ -114,6 +114,7 @@ public class IdTable {
 
 	// 指定されたuuidとnameをデータベースに追加する
 	public boolean addPlayer (UUID uuid, String playerName) {
+		Connection con = null;
 		Statement stmt = null;
 		String sql = null;
 		int id = getPlayerIdFromUUID(uuid);
@@ -134,12 +135,15 @@ public class IdTable {
 
 		// SQL文を投げる
 		try {
-			stmt = mysql.getConnection().createStatement();
-			stmt.execute(sql);
-			stmt.close();
+			con = mysql.getConnection();
+			stmt = con.createStatement();
+			stmt.executeUpdate(sql);
+			con.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			mysql.closeStatement(stmt);
 		}
 
 

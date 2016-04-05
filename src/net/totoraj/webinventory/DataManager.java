@@ -48,24 +48,16 @@ public class DataManager {
 
 	}
 
-	public void setUp() {
-		// MySQLに接続
-		available = mysql.connect();
-		plugin.CAN_USE = available;
+	public void setUp () {
+		plugin.info(WIMessages.getConnectedDb());
+		available = idtable.setUpTable() && itemtable.setUpTable();
 
-		// 接続されていれば初期処理
-		if (available) {
-			plugin.info(WIMessages.getConnectedDb());
-			available = idtable.setUpTable() && itemtable.setUpTable();
-		}
-		// 接続されていなければ終了
-		else {
-			plugin.info(WIMessages.getFailedConncectDb());
-		}
+		plugin.CAN_USE = available;
 
 		if (available) {
 			plugin.info(WIMessages.getTableIsReady());
 		} else {
+			plugin.info(WIMessages.getFailedConncectDb());
 			plugin.info(WIMessages.getFailedReadyTable());
 		}
 
@@ -124,15 +116,6 @@ public class DataManager {
 			count++;
 		}
 
-//		HashMap<Integer, String> item_map = itemtable.getItems2(player_id);
-//		for (int key : item_map.keySet()) {
-//			try {
-//				temp_yaml.loadFromString(item_map.get(key));
-//				inventory.setItem(key, temp_yaml.getItemStack("item"));
-//			} catch (InvalidConfigurationException e) {
-//				e.printStackTrace();
-//			}
-//		}
 		return inventory;
 	}
 
@@ -164,17 +147,6 @@ public class DataManager {
 		}
 
 		return itemtable.updateItemRecords(player_id, item_stacks);
-
-
-//		HashMap<Integer, String> item_map = new HashMap<Integer, String>();
-//		for (ItemStack item : inv.getContents()){
-//			if (item != null) {
-//				temp_yaml.set("item", item);
-//				item_map.put(count, temp_yaml.saveToString());
-//			}
-//			count++;
-//		}
-//		return itemtable.setItems(player_id, item_map);
 	}
 
 

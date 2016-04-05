@@ -1,11 +1,11 @@
 package net.totoraj.webinventory.sql;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import net.totoraj.webinventory.DataManager;
 
@@ -29,51 +29,60 @@ public class ItemTable {
 //		String sql = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + cls
 //				+ ")";
 
-		String sql = "CREATE TABLE IF NOT EXISTS "+tableName+" ("
-				+"id int AUTO_INCREMENT,\n"
-				+"player_id int,\n"
-				+"slot_number int,\n"
-				+"item_stack text,\n"
-				+"FOREIGN KEY (player_id)"
-				+" REFERENCES "+datamanager.getIdTable().getTableName()+"(id),\n"
-				+"PRIMARY KEY (player_id, slot_number),\n"
-				+"INDEX(id)\n"
-				+")";
+		String sql = ""
+				+"\n"+"CREATE TABLE IF NOT EXISTS "+tableName+" ("
+				+"\n"+"id int AUTO_INCREMENT,"
+				+"\n"+"player_id int,"
+				+"\n"+"slot_number int,"
+				+"\n"+"item_stack text,"
+				+"\n"+"FOREIGN KEY (player_id)"
+				+"\n"+"REFERENCES "+datamanager.getIdTable().getTableName()+"(id),"
+				+"\n"+"PRIMARY KEY (player_id, slot_number),"
+				+"\n"+"INDEX(id)"
+				+"\n"+");";
 
 		// テーブル作成SQLをデータベースに投げる
+		Connection con = null;
 		Statement stmt = null;
 		try {
+			con = mysql.getConnection();
+			if (con == null) {
+				return false;
+			}
 			stmt = mysql.getConnection().createStatement();
-			stmt.execute(sql);
+			stmt.executeUpdate(sql);
+			con.commit();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			return false;
 		} finally {
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (SQLException e) {
-				}
-			}
+			mysql.closeStatement(stmt);
 		}
 		return true;
 	}
 
 
 	// プレイヤー用のレコードを用意する
-	public void setUpPlayerItemRecords (int player_id) {
+	public boolean setUpPlayerItemRecords (int player_id) {
 		String select_sql = "SELECT * FROM "+tableName+" WHERE player_id = "+player_id;
+
+		Connection con = null;
+		Statement select_stmt = null;
+		Statement insert_stmt = null;
+		ResultSet rs = null;
 		try {
-			Statement select_stmt = mysql.getConnection().createStatement();
-			ResultSet rs = select_stmt.executeQuery(select_sql);
+			con = mysql.getConnection();
+			if (con == null) {
+				return false;
+			}
+			select_stmt = con.createStatement();
+			rs = select_stmt.executeQuery(select_sql);
 			// 1つでもレコードが存在したら何もせず終了
 			while (rs.next()) {
 				rs.close();
 				select_stmt.close();
-				return;
+				return true;
 			}
-			rs.close();
-			select_stmt.close();
 
 			// INSERTする内容を作成
 			String insert_sql = "INSERT INTO "+tableName+" (player_id, slot_number, item_stack) VALUES ";
@@ -86,14 +95,19 @@ public class ItemTable {
 			insert_sql += String.join(",", insert_values);
 
 			// データベースにINSERTを投げる
-			Statement insert_stmt = mysql.getConnection().createStatement();
-			insert_stmt.execute(insert_sql);
-
-			insert_stmt.close();
+			insert_stmt = con.createStatement();
+			insert_stmt.executeUpdate(insert_sql);
+			con.commit();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+			return false;
+		} finally {
+			mysql.closeResultSet(rs);
+			mysql.closeStatement(select_stmt);
+			mysql.closeStatement(insert_stmt);
 		}
+		return true;
 
 	}
 
@@ -113,8 +127,16 @@ public class ItemTable {
 			update_values += temp;
 		}
 		update_sql = update_sql_before + update_values + update_sql_after;
+
+
+		Connection con = null;
+		PreparedStatement update_stmt = null;
 		try {
-			PreparedStatement update_stmt = mysql.getConnection().prepareStatement(update_sql);
+			con = mysql.getConnection();
+			if (con == null) {
+				return false;
+			}
+			update_stmt = con.prepareStatement(update_sql);
 
 			// SQL文のitem_stackをセット
 			for (int i=0; i < 54; i++) {
@@ -125,13 +147,14 @@ public class ItemTable {
 					update_stmt.setString(i+1, item_stacks[i]);
 				}
 			}
-			// 送信
+
 			update_stmt.execute();
-			// 閉じる
-			update_stmt.close();
+			con.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			mysql.closeStatement(update_stmt);
 		}
 
 		return true;
@@ -144,10 +167,11 @@ public class ItemTable {
 				+" WHERE player_id = "+player_id
 				+" ORDER BY slot_number"
 				+" LIMIT 54";
-
+		Statement select_stmt = null;
+		ResultSet rs = null;
 		try {
-			Statement select_stmt = mysql.getConnection().createStatement();
-			ResultSet rs = select_stmt.executeQuery(select_sql);
+			select_stmt = mysql.getConnection().createStatement();
+			rs = select_stmt.executeQuery(select_sql);
 
 			// 取得したアイテムを配列にセット
 			int count = 0;
@@ -156,71 +180,15 @@ public class ItemTable {
 				count++;
 			}
 
-			// 閉じる
-			rs.close();
-			select_stmt.close();
-
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
+		} finally {
+			mysql.closeResultSet(rs);
+			mysql.closeStatement(select_stmt);
 		}
 
 		return item_stacks;
 	}
-
-	public boolean setItems (int player_id, HashMap<Integer, String> item_map) {
-		String delete_sql = "DELETE FROM "+tableName+" WHERE player_id = "+player_id;
-		String insert_sql = "INSERT INTO "+tableName+" (player_id, slot_number, item_stack) VALUES ";
-		ArrayList<String> insert_values = new ArrayList<String>();
-
-
-		try{
-			// 削除リクエスト
-			Statement delete_stmt = mysql.getConnection().createStatement();
-			delete_stmt.execute(delete_sql);
-
-			// 追加がなければ終了
-			if (item_map.isEmpty()) {
-				return true;
-			}
-			// 追加リクエスト
-			for (int slot_number : item_map.keySet()) {
-				insert_values.add("("+player_id+","+slot_number+", ?)");
-			}
-			PreparedStatement insert_stmt = mysql.getConnection().prepareStatement(insert_sql+String.join(",", insert_values));
-			int count = 0;
-			for (int key : item_map.keySet()) {
-				insert_stmt.setString(++count, item_map.get(key));
-			}
-			insert_stmt.execute();
-			insert_stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
-	public HashMap<Integer, String> getItems2 (int player_id) {
-		HashMap<Integer, String> map = new HashMap<Integer, String>();
-		String select_sql = "SELECT * FROM "+tableName+" WHERE player_id = ?;";
-		PreparedStatement select_stmt = null;
-
-		// SQL文を投げる
-		try {
-			select_stmt = mysql.getConnection().prepareStatement(select_sql);
-			select_stmt.setInt(1, player_id);
-			ResultSet rs = select_stmt.executeQuery();
-			while(rs.next()) {
-				map.put(rs.getInt("slot_number"), rs.getString("item_stack"));
-			}
-			select_stmt.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		return map;
-	}
-
 
 }

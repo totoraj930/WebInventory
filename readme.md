@@ -29,18 +29,21 @@ command: `webinventoryadmin`
 
 aliases: [`wiadmin`, `wia`]
 
-`/wia <reload | yaml | close | toggle>`
+`/wia <toggle | close | reconnect | reload | yaml>`
 
+* toggle
+  - WebInventoryが開けるか開けないかを切り替える
+  - 開けなくなると同時に開かれているすべてのWebInventoryを閉じる
+* close
+  - 開かれているすべてのWebInventoryを閉じる
+  - データベースを直接いじるときに使うコマンドです
+* reconnect
+  - (configを再読み込みして)データベースに再接続する
 * reload
   - messages.ymlを再読み込みする
 * yaml
   - 未実装です❤
-* close
-  - 開かれているすべてのWebInventoryを閉じる
-* toggle
-  - WebInventoryが開けるか開けないかを切り替える
-  - 開けなくなると同時に開かれているすべてのWebInventoryを閉じる
-  - データベースを直接いじるときに使うコマンドです
+
 
 ### open
 command: `webinventoryopen`
@@ -68,6 +71,10 @@ aliases: [`webi`, `wi`]
 `/wi signup`
 
 登録する
+
+`/wi`
+
+自分のインベントリを開く
 
 ## パーミッション(Permissions)
 
@@ -98,7 +105,7 @@ aliases: [`webi`, `wi`]
 
 
 ## ライセンス(License)
-Copyright &copy; 2016 Reona Oshima (totoraj)  
-This work is released  under the MIT License.  
+Copyright &copy; 2016 Reona Oshima (totoraj)
+This work is released  under the MIT License.
 <http://opensource.org/licenses/mit-license.php>
 

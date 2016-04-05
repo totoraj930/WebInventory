@@ -50,6 +50,17 @@ public class WIAdminCommand implements TabExecutor {
 			return true;
 		}
 
+		if (args[0].equals("reconnect")) {
+			boolean result = plugin.resetDataManager();
+			if (result) {
+				sender.sendMessage(WIMessages.getReconnect());
+			}
+			else {
+				sender.sendMessage(WIMessages.getFailedReconnect());
+			}
+			return true;
+
+		}
 		if (args[0].equals("yaml")) {
 			sender.sendMessage(Utility.replaceColorCode("&4未実装です❤"));
 			return true;
@@ -64,17 +75,20 @@ public class WIAdminCommand implements TabExecutor {
 		if (args.length == 1) {
 			String prefix = args[0].toLowerCase();
 			ArrayList<String> commands = new ArrayList<String>();
-			if ("reload".startsWith(prefix)) {
-				commands.add("reload");
-			}
-			if ("yaml".startsWith(prefix)) {
-				commands.add("yaml");
-			}
 			if ("toggle".startsWith(prefix)) {
 				commands.add("toggle");
 			}
 			if ("close".startsWith(prefix)) {
 				commands.add("close");
+			}
+			if ("reconnect".startsWith(prefix)) {
+				commands.add("reconnect");
+			}
+			if ("reload".startsWith(prefix)) {
+				commands.add("reload");
+			}
+			if ("yaml".startsWith(prefix)) {
+				commands.add("yaml");
 			}
 			return commands;
 		}

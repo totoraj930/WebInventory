@@ -40,6 +40,7 @@ public class WIMessages {
 	private String doNotHavePermission;
 	private String signUp;
 	private String reloadMessagesYaml;
+	private String reconnect;
 	private String closeAllInventory;
 	private String inventoryEnabled;
 	private String inventoryDisabled;
@@ -48,6 +49,7 @@ public class WIMessages {
 	private String failedConncectDb;
 	private String failedCreateTable;
 	private String failedReadyTable;
+	private String failedReconnect;
 	private String notEnoughArguments;
 	private String failedSignUp;
 	private String notPlayer;
@@ -69,6 +71,7 @@ public class WIMessages {
 		this.doNotHavePermission = resources.getString("doNotHavePermission");
 		this.signUp = resources.getString("signUp");
 		this.reloadMessagesYaml = resources.getString("reloadMessagesYaml");
+		this.reconnect = resources.getString("reconnect");
 		this.closeAllInventory = resources.getString("closeAllInventory");
 		this.inventoryEnabled = resources.getString("inventoryEnabled");
 		this.inventoryDisabled = resources.getString("inventoryDisabled");
@@ -76,6 +79,7 @@ public class WIMessages {
 		this.failedConncectDb = resources.getString("failedConnectDb");
 		this.failedCreateTable = resources.getString("failedCreateTable");
 		this.failedReadyTable = resources.getString("failedReadyTable");
+		this.failedReconnect = resources.getString("failedReconnect");
 		this.notEnoughArguments = resources.getString("notEnoughArguments");
 		this.failedSignUp = resources.getString("failedSignUp");
 		this.notPlayer = resources.getString("notPlayer");
@@ -95,6 +99,7 @@ public class WIMessages {
 		this.doNotHavePermission = Utility.replaceColorCode(this.doNotHavePermission);
 		this.signUp = Utility.replaceColorCode(this.signUp);
 		this.reloadMessagesYaml = Utility.replaceColorCode(this.reloadMessagesYaml);
+		this.reconnect = Utility.replaceColorCode(this.reconnect);
 		this.closeAllInventory = Utility.replaceColorCode(this.closeAllInventory);
 		this.inventoryEnabled = Utility.replaceColorCode(this.inventoryEnabled);
 		this.inventoryDisabled = Utility.replaceColorCode(this.inventoryDisabled);
@@ -102,6 +107,7 @@ public class WIMessages {
 		this.failedConncectDb = Utility.replaceColorCode(this.failedConncectDb);
 		this.failedCreateTable = Utility.replaceColorCode(this.failedCreateTable);
 		this.failedReadyTable = Utility.replaceColorCode(this.failedReadyTable);
+		this.failedReconnect = Utility.replaceColorCode(this.failedReconnect);
 		this.notEnoughArguments = Utility.replaceColorCode(this.notEnoughArguments);
 		this.failedSignUp = Utility.replaceColorCode(this.failedSignUp);
 		this.notPlayer = Utility.replaceColorCode(this.notPlayer);
@@ -295,6 +301,14 @@ public class WIMessages {
 
 	public static String getInventoryDisabled() {
 		return instance.inventoryDisabled;
+	}
+
+	public static String getReconnect() {
+		return instance.reconnect;
+	}
+
+	public static String getFailedReconnect() {
+		return instance.failedReconnect;
 	}
 
 

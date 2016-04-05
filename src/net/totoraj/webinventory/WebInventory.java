@@ -29,6 +29,14 @@ public class WebInventory extends JavaPlugin {
 		this.getServer().getMessenger().registerOutgoingPluginChannel(this, msg);
 	}
 
+	// データベースの接続を更新
+	public boolean resetDataManager () {
+		DATA_MANAGER.getMySQL().close();
+		DATA_MANAGER = new DataManager(this);
+		DATA_MANAGER.setUp();
+
+		return CAN_USE;
+	}
 	@Override
 	public void onEnable() {
 		// Configを読み込み
@@ -78,9 +86,6 @@ public class WebInventory extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		if (DATA_MANAGER.getMySQL().close()) {
-			getLogger().info("データベースから切断しました");
-		}
-
+		DATA_MANAGER.getMySQL().close();
 	}
 }
