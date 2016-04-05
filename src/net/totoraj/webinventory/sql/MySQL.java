@@ -23,7 +23,6 @@ public class MySQL {
 			if (con == null ||con.isClosed() || !con.isValid(10)) {
 				con = DriverManager.getConnection("jdbc:mysql://"+Address +":"+Port+"/"+Db, Username, Password);
 				con.setAutoCommit(false);
-				System.out.println("getConnection");
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
